@@ -7,6 +7,8 @@ import AppBar from "material-ui/AppBar"
 import Toolbar from "material-ui/Toolbar"
 import Typography from "material-ui/Typography"
 import AppToolbarAvatar from "./AppToolbarAvatar"
+import IconButton from "material-ui/IconButton"
+import ArrowBack from "material-ui-icons/ArrowBack"
 
 const styles = theme => ({
   root: {
@@ -26,6 +28,10 @@ class AppToolbar extends React.Component {
     this.props.history.push("/auth/signup")
   }
 
+  handleBackClick = () => {
+    this.props.history.push("/")
+  }
+
   handleLogoutClick = () => {
     this.props.dispatch(logoutUser())
   }
@@ -33,9 +39,24 @@ class AppToolbar extends React.Component {
   render() {
     const { status, userData } = this.props.auth.auth
     const { classes } = this.props
+    const { pathname } = this.props.history.location
+
     return (
       <AppBar className={classes.root} position="fixed">
         <Toolbar>
+          {pathname === "/" ? (
+            undefined
+          ) : (
+            <IconButton
+              className={classes.menuButton}
+              color="contrast"
+              aria-label="Back"
+              onClick={this.handleBackClick.bind(this)}
+            >
+              <ArrowBack />
+            </IconButton>
+          )}
+
           <Typography type="title" color="inherit" className={classes.flex}>
             Game Character Info
           </Typography>

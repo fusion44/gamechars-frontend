@@ -71,7 +71,10 @@ class App extends Component {
             <Route exact path="/character/add">
               <CharacterAdd />
             </Route>
-            <Route path="/character/:characterId" component={CharacterDetail} />
+            <Route
+              path="/character/view/:characterId"
+              component={CharacterDetail}
+            />
             <Route exact path="/auth/login">
               <Login />
             </Route>

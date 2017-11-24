@@ -1,4 +1,5 @@
 import React from "react"
+import { Link } from "react-router-dom"
 import PropTypes from "prop-types"
 
 import "./CharacterListItem.css"
@@ -10,12 +11,17 @@ const CharacterListItem = props => {
 
   return (
     <div className="CharacterListItem">
-      <div className="AvatarHeaderText">{props.character.name}</div>
-      <img
-        className="AvatarImage"
-        src={imageURL}
-        alt="Avatar of the game character"
-      />
+      <Link
+        to={`/character/view/${props.character.id}`}
+        style={{ textDecoration: "none" }}
+      >
+        <div className="AvatarHeaderText">{props.character.name}</div>
+        <img
+          className="AvatarImage"
+          src={imageURL}
+          alt="Avatar of the game character"
+        />
+      </Link>
     </div>
   )
 }
