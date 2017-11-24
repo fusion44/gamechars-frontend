@@ -3,6 +3,8 @@
 A simple frontend for my tests with a
 [GraphQL server](https://github.com/fusion44/gamechars-server).
 
+![Screenshot of the frontend](/screenshots/1.png)
+
 ## Installation
 
 This is a
