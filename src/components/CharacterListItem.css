@@ -1,0 +1,22 @@
+.CharacterListItem {
+  background: white;
+  border: 2px solid lightgrey;
+  margin: 5px;
+  width: auto;
+  height: auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.AvatarImage {
+  width: 350px;
+  height: 350px;
+}
+
+.AvatarHeaderText {
+  color: darkslategray;
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 1px solid grey;
+}

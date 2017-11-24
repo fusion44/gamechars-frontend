@@ -1,0 +1,9 @@
+.CharacterList {
+  display: flex;
+  justify-content: center;
+  flex-flow: row wrap;
+  align-items: center;
+  background: rgb(241, 241, 241);
+  width: auto;
+  position: relative;
+}
