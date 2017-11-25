@@ -1,4 +1,5 @@
 import React, { Component } from "react"
+import { connect } from "react-redux"
 import { withRouter } from "react-router"
 import gql from "graphql-tag"
 import { graphql } from "react-apollo"
@@ -10,7 +11,9 @@ import Input, { InputLabel } from "material-ui/Input"
 import { MenuItem } from "material-ui/Menu"
 import { FormControl } from "material-ui/Form"
 import Select from "material-ui/Select"
+import Switch from "material-ui/Switch"
 import { GAME_CHARS_QUERY } from "./CharacterList"
+import { FormControlLabel } from "material-ui/Form"
 
 const styles = theme => ({
   root: {
@@ -31,6 +34,10 @@ export const ADD_GAME_CHAR_MUTATION = gql`
     $debutGame: String!
     $releaseYear: Int!
     $img: String!
+    $desc: String!
+    $wiki: String!
+    $isPublic: Boolean!
+    $owner: String!
   ) {
     addCharacter(
       char: {
@@ -38,6 +45,10 @@ export const ADD_GAME_CHAR_MUTATION = gql`
         debutGame: $debutGame
         releaseYear: $releaseYear
         img: $img
+        desc: $desc
+        wiki: $wiki
+        public: $isPublic
+        owner: $owner
       }
     ) {
       id
@@ -54,7 +65,10 @@ class CharacterAdd extends Component {
       name: "",
       debutGame: "",
       releaseYear: 2017,
-      img: "http://via.placeholder.com/500x500"
+      img: "http://via.placeholder.com/500x500",
+      desc: "",
+      wiki: "",
+      isPublic: true
     }
   }
 
@@ -71,9 +85,28 @@ class CharacterAdd extends Component {
   }
 
   handleSubmit() {
-    const { name, debutGame, releaseYear, img } = this.state
+    const {
+      name,
+      debutGame,
+      releaseYear,
+      img,
+      desc,
+      wiki,
+      isPublic
+    } = this.state
+    const { userName } = this.props.auth.userData
+
     this.props
-      .addCharacter(name, debutGame, parseInt(releaseYear, 10), img)
+      .addCharacter(
+      name,
+      debutGame,
+      parseInt(releaseYear, 10),
+      img,
+      desc,
+      wiki,
+      isPublic,
+      userName
+      )
       .then(({ data }) => {
         this.props.history.push("/")
       })
@@ -122,6 +155,38 @@ class CharacterAdd extends Component {
           value={this.state.img}
           onChange={({ target: { value: img } }) => this.setState({ img })}
         />
+
+        <TextField
+          className={classes.tf}
+          label="Character Description"
+          multiline
+          value={this.state.desc}
+          onChange={event => {
+            this.setState({ desc: event.target.value })
+          }}
+          margin="normal"
+        />
+
+        <TextField
+          className={classes.tf}
+          label="Wiki URL"
+          value={this.state.wiki}
+          onChange={({ target: { value: wiki } }) => this.setState({ wiki })}
+        />
+
+        <FormControlLabel
+          control={
+            <Switch
+              checked={this.state.isPublic}
+              onChange={event => {
+                this.setState({ isPublic: event.target.checked })
+              }}
+              aria-label="Public"
+            />
+          }
+          label="Public"
+        />
+
         <div>
           <Button onClick={this.handleSubmit.bind(this)}>Add</Button>
           <Button
@@ -139,9 +204,27 @@ class CharacterAdd extends Component {
 
 export const withMutation = graphql(ADD_GAME_CHAR_MUTATION, {
   props: ({ mutate }) => ({
-    addCharacter: (name, debutGame, releaseYear, img) =>
+    addCharacter: (
+      name,
+      debutGame,
+      releaseYear,
+      img,
+      desc,
+      wiki,
+      isPublic,
+      owner
+    ) =>
       mutate({
-        variables: { name, debutGame, releaseYear, img },
+        variables: {
+          name,
+          debutGame,
+          releaseYear,
+          img,
+          desc,
+          wiki,
+          isPublic,
+          owner
+        },
         update: (store, { data: { addCharacter } }) => {
           /* 
             { data: { addCharacter } } unpacks "data.data.addCharacter"
@@ -159,4 +242,10 @@ export const withMutation = graphql(ADD_GAME_CHAR_MUTATION, {
   })
 })
 
-export default withStyles(styles)(withRouter(withMutation(CharacterAdd)))
+const mapStateToProps = ({ auth }) => {
+  return { auth: auth.auth }
+}
+
+export default withStyles(styles)(
+  withRouter(withMutation(connect(mapStateToProps)(CharacterAdd)))
+)
