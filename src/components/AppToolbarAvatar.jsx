@@ -24,7 +24,7 @@ const AppToolbarAvatar = props => {
 AppToolbarAvatar.propTypes = {
   isLoggedIn: PropTypes.bool.isRequired,
   signedInUser: PropTypes.shape({
-    userName: PropTypes.string.isRequired
+    userName: PropTypes.string
   }),
   onSignUpClick: PropTypes.func.isRequired,
   onLoginClick: PropTypes.func.isRequired,

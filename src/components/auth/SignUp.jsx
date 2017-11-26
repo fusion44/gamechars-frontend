@@ -47,25 +47,52 @@ class SignUp extends Component {
     return this.state.pw1.length > 5 ? true : false
   }
 
-  handleSubmit() {
+  handleSubmit(event) {
     const { name, email, pw1 } = this.state
+    event.preventDefault()
+
+    let defaultErrState = {
+      nameError: false,
+      emailError: false,
+      pwError: false
+    }
 
     let anyError = false
     if (name.length < 2) {
-      this.setState({ nameError: true })
+      defaultErrState.nameError = true
       anyError = true
     }
     if (!this.validateEmail(this.state.email)) {
-      this.setState({ emailError: true })
+      defaultErrState.emailError = true
       anyError = true
     }
     if (!this.validatePasswords()) {
-      this.setState({ pwError: true })
+      defaultErrState.pwError = true
       anyError = true
     }
 
+    this.setState({ ...defaultErrState })
+
     if (!anyError) {
-      this.props.dispatch(signUpUser({ username: name, email, password: pw1 }))
+      this.props
+        .dispatch(signUpUser({ username: name, email, password: pw1 }))
+        .then(res => this.props.history.push("/"))
+        .catch(err => {
+          // Normally, all data is checked before sent to the server
+          // just in case the api server changes defaults we'll check the returned errors
+          if (err.errorData.errorMessages) {
+            err.errorData.errorMessages.forEach(error => {
+              if (error.Type === "userName") {
+                this.setState({ nameError: true })
+              } else if (error.Type === "email") {
+                this.setState({ emailError: true })
+              } else if (error.Type === "password") {
+                this.setState({ pwError: true })
+              }
+            })
+          }
+          this.setState({ error: true })
+        })
     }
   }
 
@@ -73,7 +100,7 @@ class SignUp extends Component {
     const { classes } = this.props
 
     return (
-      <div className={classes.root}>
+      <form className={classes.root} onSubmit={this.handleSubmit.bind(this)}>
         <Typography type="display3" gutterBottom>
           Sign Up
         </Typography>
@@ -116,7 +143,7 @@ class SignUp extends Component {
           onChange={({ target: { value: pw2 } }) => this.setState({ pw2 })}
         />
         <div>
-          <Button onClick={this.handleSubmit.bind(this)}>Sign Up</Button>
+          <Button type="submit">Sign Up</Button>
           <Button
             onClick={() => {
               this.props.history.push("/")
@@ -125,7 +152,7 @@ class SignUp extends Component {
             Cancel
           </Button>
         </div>
-      </div>
+      </form>
     )
   }
 }

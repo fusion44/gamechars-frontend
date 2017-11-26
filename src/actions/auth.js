@@ -32,7 +32,7 @@ export const logoutUserSuccess = () => ({
 })
 
 export const signUpUser = userData => dispatch => {
-  fetch(`${AUTH_API_ENDPOINT}/signup`, {
+  return fetch(`${AUTH_API_ENDPOINT}/signup`, {
     method: "POST",
     body: JSON.stringify(userData),
     credentials: "include"
@@ -42,7 +42,7 @@ export const signUpUser = userData => dispatch => {
 }
 
 export const loginUser = userData => dispatch => {
-  fetch(`${AUTH_API_ENDPOINT}/login`, {
+  return fetch(`${AUTH_API_ENDPOINT}/login`, {
     method: "POST",
     body: JSON.stringify(userData),
     credentials: "include"
@@ -68,40 +68,60 @@ export const logoutUser = userData => dispatch => {
 }
 
 const checkResponse = (response, dispatch) => {
-  switch (response.status) {
-    case 200:
-      // all OK, user was logged in
-      var dec = new TextDecoder()
-      response.body
-        .getReader()
-        .read()
-        .then(res => {
-          dispatch(
-            loginUserSuccess({
-              status: "logged_in",
-              userData: JSON.parse(dec.decode(res.value))
-            })
-          )
-        })
-      break
-    case 401:
-    case 500:
-      // 401 Sent by the server if username and/or password is wrong
-      // 500 Sent by the server if a server error occurred
-      dec = new TextDecoder()
-      response.body
-        .getReader()
-        .read()
-        .then(res => {
-          dispatch(
-            loginUserError({
-              status: "error",
-              errorMessage: JSON.parse(dec.decode(res.value))
-            })
-          )
-        })
-      break
-    default:
-      break
-  }
+  return new Promise((resolve, reject) => {
+    switch (response.status) {
+      case 200:
+        // all OK, user was logged in
+        var dec = new TextDecoder()
+        response.body
+          .getReader()
+          .read()
+          .then(res => {
+            return dispatch(
+              loginUserSuccess({
+                status: "logged_in",
+                userData: JSON.parse(dec.decode(res.value))
+              })
+            )
+          })
+          .then(res => resolve(res))
+        break
+      case 400:
+        // 400 Sent by server when signup data is invalid
+        dec = new TextDecoder()
+        response.body
+          .getReader()
+          .read()
+          .then(res => {
+            return dispatch(
+              signUpUserError({
+                status: "error",
+                errorMessages: JSON.parse(dec.decode(res.value))
+              })
+            )
+          })
+          .then(res => reject(res))
+        break
+      case 401:
+      case 500:
+        // 401 Sent by the server if username and/or password is wrong
+        // 500 Sent by the server if a server error occurred
+        dec = new TextDecoder()
+        response.body
+          .getReader()
+          .read()
+          .then(res => {
+            return dispatch(
+              loginUserError({
+                status: "error",
+                errorMessage: JSON.parse(dec.decode(res.value)).message
+              })
+            )
+          })
+          .then(res => reject(res))
+        break
+      default:
+        break
+    }
+  })
 }

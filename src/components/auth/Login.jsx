@@ -25,19 +25,25 @@ class Login extends Component {
     super(props)
     this.state = {
       username: "",
-      password: ""
+      password: "",
+      error: false
     }
   }
 
-  handleSubmit() {
+  handleSubmit(event) {
     const { username, password } = this.state
-    this.props.dispatch(loginUser({ username, password }))
+    event.preventDefault()
+
+    this.props
+      .dispatch(loginUser({ username, password }))
+      .then(res => this.props.history.push("/"))
+      .catch(err => this.setState({ error: true }))
   }
 
   render() {
     const { classes } = this.props
     return (
-      <div className={classes.root}>
+      <form className={classes.root} onSubmit={this.handleSubmit.bind(this)}>
         <Typography type="display3" gutterBottom>
           Login
         </Typography>
@@ -49,18 +55,23 @@ class Login extends Component {
           label="Username"
           value={this.state.username}
           onChange={({ target: { value: username } }) =>
-            this.setState({ username })}
+            this.setState({ username })
+          }
+          error={this.state.error}
         />
         <TextField
           className={classes.tf}
           label="Password"
           value={this.state.password}
           onChange={({ target: { value: password } }) =>
-            this.setState({ password })}
+            this.setState({ password })
+          }
+          type="password"
+          error={this.state.error}
         />
 
         <div>
-          <Button onClick={this.handleSubmit.bind(this)}>Login</Button>
+          <Button type="submit">Login</Button>
           <Button
             onClick={() => {
               this.props.history.push("/")
@@ -69,7 +80,7 @@ class Login extends Component {
             Cancel
           </Button>
         </div>
-      </div>
+      </form>
     )
   }
 }

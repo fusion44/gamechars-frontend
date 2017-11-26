@@ -19,10 +19,14 @@ export function authReducer(
       }
 
     case SIGN_UP_USER_ERROR:
+      return {
+        ...state,
+        auth: action.errorData
+      }
     case LOGIN_USER_ERROR:
       return {
         ...state,
-        auth: action.userData
+        auth: action.errorData.errorMessage
       }
     case LOGOUT_USER_SUCCESS:
       return {

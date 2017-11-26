@@ -62,7 +62,7 @@ class AppToolbar extends React.Component {
           </Typography>
           <AppToolbarAvatar
             isLoggedIn={status === "logged_in"}
-            signedInUser={{ userName: userData.userName }}
+            signedInUser={userData ? { userName: userData.userName } : {}}
             onSignUpClick={this.handleSignUpClick.bind(this)}
             onLoginClick={this.handleLoginClick.bind(this)}
             onLogoutClick={this.handleLogoutClick.bind(this)}
